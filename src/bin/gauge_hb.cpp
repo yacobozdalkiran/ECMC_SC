@@ -39,8 +39,9 @@ void generate_hb(const RunParamsHbCB& rp, bool existing) {
         }
     }
 
-    // Params ECMC
+    // Params Hb
     HbParams h = rp.hp;
+    int N_unit = 1000;
 
     // Measure vectors
     std::vector<double> plaquette;
@@ -69,6 +70,9 @@ void generate_hb(const RunParamsHbCB& rp, bool existing) {
                 std::cout << "\n====== Configuration " << i << " ======\n";
                 std::cout << "(Therm) Sample " << i / rp.N_plaquette << ", <P> = " << p << "\n";
             }
+            if (i % N_unit == 0 and i>0) {
+                field.project_field_su3();
+            }
         }
     }
 
@@ -79,6 +83,10 @@ void generate_hb(const RunParamsHbCB& rp, bool existing) {
 
     for (int i = 0; i < rp.N_samples; i++) {
         for (int j = 0; j < h.N_sweeps; j++) heatbath::sweep(field, geo, h.beta, h.N_hits, rng);
+
+        if (i % N_unit == 0 and i>0) {
+            field.project_field_su3();
+        }
 
         // Plaquette measure
         if ((i % rp.N_plaquette == 0) and (i > 0 or !existing)) {
