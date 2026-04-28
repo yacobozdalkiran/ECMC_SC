@@ -135,3 +135,37 @@ endif()
 
 target_link_libraries(gauge_hb PRIVATE Eigen3::Eigen lime)
 
+#=====================================Metro SC========================================
+add_executable(gauge_metro src/bin/gauge_metropolis.cpp
+        src/gauge/GaugeField.cpp
+        src/su3/utils.cpp
+        src/geometry/GeometryCB.cpp
+        src/geometry/types.h
+        src/observables/observables.cpp
+        src/metropolis/metropolis.cpp
+        src/io/params.h
+        src/io/io.cpp
+        src/io/ildg.cpp
+)
+
+
+# Configuration des options selon le compilateur détecté
+if(CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
+    # Options spécifiques à icpx (OneAPI)
+    target_compile_options(gauge_metro PRIVATE
+            -O3
+            -xHost            # Remplace -march=native pour Intel
+            -fp-model precise
+            -Wall -Wextra
+    )
+else()
+    target_compile_options(gauge_metro PRIVATE
+            -O3
+            -ffast-math
+            -march=native
+            -Wall -Wextra -Wpedantic
+    )
+endif()
+
+target_link_libraries(gauge_metro PRIVATE Eigen3::Eigen lime)
+
