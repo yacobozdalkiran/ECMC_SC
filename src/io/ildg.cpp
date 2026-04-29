@@ -37,14 +37,16 @@ void save_ildg(const GaugeField &field, const GeometryCB &geo, const std::string
         std::cerr << "Couldn't create folder : " << e.what() << std::endl;
         return;
     }
-    fs::path filepath = dir/run_name/run_name;
+    fs::path final_path = dir/run_name/run_name;
+    fs::path tmp_path = final_path;
+    tmp_path += ".tmp";
 
     // 1. Prepare XML (double precision)
     std::string xml_header = generate_ildg_xml(geo.L, geo.L, geo.L, geo.L); // Lx, Ly, Lz, Lt
 
-    // 2. Open C-LIME writer
-    FILE *fp = fopen(filepath.c_str(), "wb");
-    if (!fp) throw std::runtime_error("Impossible de créer le fichier");
+    // 2. Open C-LIME writer on temporary file
+    FILE *fp = fopen(tmp_path.c_str(), "wb");
+    if (!fp) throw std::runtime_error("Impossible de créer le fichier temporaire : " + tmp_path.string());
     LimeWriter *writer = limeCreateWriter(fp);
 
     // 3. Write the XML Record
@@ -83,7 +85,15 @@ void save_ildg(const GaugeField &field, const GeometryCB &geo, const std::string
     limeDestroyHeader(h_bin);
     limeDestroyWriter(writer);
     fclose(fp);
-    std::cout << "Configuration written in " << filepath << "\n";
+
+    // 5. Atomic rename
+    try {
+        fs::rename(tmp_path, final_path);
+    } catch (const fs::filesystem_error& e) {
+        throw std::runtime_error("Erreur lors du renommage du fichier ILDG : " + std::string(e.what()));
+    }
+
+    std::cout << "Configuration written in " << final_path << "\n";
 }
 
 void read_ildg(GaugeField &field, const GeometryCB &geo, const std::string &run_name, const std::string& run_dir) {
