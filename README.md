@@ -24,3 +24,11 @@ The exectables are
 * `gauge_heatbath` for Heatbath
 * `gauge_metropolis` for Metropolis
 
+For each of these, you need to pass an input .txt file to run the simulation. Two example input files `etest.txt` and `htest.txt` are in the folder `inputs/`, resp. for ECMC and Heatbath executables.
+
+Example :
+
+```bash
+./build/gauge_ecmc inputs/etest.txt
+```
+
