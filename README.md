@@ -19,8 +19,8 @@ make -j 4
 
 The exectables are 
 
--`gauge_ecmc_norev` for Forward ECMC
--`gauge_ecmc` for Reflective ECMC
--`gauge_heatbath` for Heatbath
--`gauge_metropolis` for Metropolis
+* `gauge_ecmc_norev` for Forward ECMC
+* `gauge_ecmc` for Reflective ECMC
+* `gauge_heatbath` for Heatbath
+* `gauge_metropolis` for Metropolis
 
