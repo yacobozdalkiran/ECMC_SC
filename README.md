@@ -32,3 +32,4 @@ Example :
 ./build/gauge_ecmc inputs/etest.txt
 ```
 
+The output files are located in the `run_dir/run_name` folder following the parameters of the input file.
