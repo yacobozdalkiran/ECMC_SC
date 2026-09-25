@@ -79,12 +79,10 @@ inline void solve_reject_fast(double A, double B, double& gamma, double& reject,
         alpha = gamma * invR - 1.0;
     }
 
-    // Clamp (std::clamp est vectorisable en C++17, ou version manuelle)
     alpha = (alpha > 1.0) ? 1.0 : ((alpha < -1.0) ? -1.0 : alpha);
 
     double theta = phi + std::asin(alpha);
 
-    // Normalisation 2*PI sans if/else complexes
     theta += (theta < 0.0) ? (2.0 * M_PI) : 0.0;
     theta -= (theta >= 2.0 * M_PI) ? (2.0 * M_PI) : 0.0;
 
