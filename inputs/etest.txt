@@ -6,10 +6,9 @@ N_therm = 10
 N_samples = 300
 N_plaquette = 5
 
-beta = 6.4035
+beta = 6.0
 param_theta_sample=1000
-param_theta_refresh_site=100
-param_theta_refresh_R = 200
+param_theta_refresh=100
 poisson=false
 
 run_name = test

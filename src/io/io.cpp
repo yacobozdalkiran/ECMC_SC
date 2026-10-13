@@ -201,8 +201,7 @@ void io::save_state(const LocalChainState& state, const std::string& filename,
 
     // Scalaires
     ofs << state.site << " " << state.mu << " " << state.epsilon << " "
-        << state.theta_parcouru_refresh_site << " " << state.theta_parcouru_refresh_R << " "
-        << state.theta_refresh_site << " " << state.theta_refresh_R << " " << state.set_counter
+        << state.theta_parcouru_refresh << " " << state.theta_refresh << " " << state.set_counter
         << " " << state.lift_counter << " " << state.rev_counter << " " << state.initialized
         << "\n";
 
@@ -236,9 +235,9 @@ void io::load_state(LocalChainState& state, const std::string& filename,
     }
 
     // 3. Lecture des scalaires
-    ifs >> state.site >> state.mu >> state.epsilon >> state.theta_parcouru_refresh_site >>
-        state.theta_parcouru_refresh_R >> state.theta_refresh_site >> state.theta_refresh_R >>
-        state.set_counter >> state.lift_counter >> state.rev_counter >> state.initialized;
+    ifs >> state.site >> state.mu >> state.epsilon >> state.theta_parcouru_refresh >>
+        state.theta_refresh >> state.set_counter >> state.lift_counter >> state.rev_counter >>
+        state.initialized;
 
     // 4. Lecture de la matrice SU3 R
     for (int i = 0; i < 3; ++i) {
@@ -344,10 +343,8 @@ void io::load_params(const std::string& filename, RunParamsECB& rp) {
     rp.ecmc_params.N_samples = 1;
     if (config.count("param_theta_sample"))
         rp.ecmc_params.param_theta_sample = std::stod(config["param_theta_sample"]);
-    if (config.count("param_theta_refresh_site"))
-        rp.ecmc_params.param_theta_refresh_site = std::stod(config["param_theta_refresh_site"]);
-    if (config.count("param_theta_refresh_R"))
-        rp.ecmc_params.param_theta_refresh_R = std::stod(config["param_theta_refresh_R"]);
+    if (config.count("param_theta_refresh"))
+        rp.ecmc_params.param_theta_refresh= std::stod(config["param_theta_refresh"]);
     if (config.count("poisson")) rp.ecmc_params.poisson = (config["poisson"] == "true");
     if (config.count("epsilon_set")) rp.ecmc_params.epsilon_set = std::stod(config["epsilon_set"]);
 
@@ -478,8 +475,7 @@ void print_parameters(const RunParamsECB& rp) {
     std::cout << "---ECMC params---\n";
     std::cout << "Beta : " << rp.ecmc_params.beta << "\n";
     std::cout << "Theta sample : " << rp.ecmc_params.param_theta_sample << "\n";
-    std::cout << "Theta refresh site : " << rp.ecmc_params.param_theta_refresh_site << "\n";
-    std::cout << "Theta refresh R : " << rp.ecmc_params.param_theta_refresh_R << "\n";
+    std::cout << "Theta refresh : " << rp.ecmc_params.param_theta_refresh<< "\n";
     std::cout << "Epsilon set : " << rp.ecmc_params.epsilon_set << "\n";
     std::cout << "Poisson law : " << (rp.ecmc_params.poisson ? "Yes" : "No") << "\n\n";
 
@@ -526,8 +522,7 @@ void io::save_params(const RunParamsECB& rp, const std::string& filename,
     file << "# ECMC params\n";
     file << "beta = " << rp.ecmc_params.beta << "\n";
     file << "theta_sample = " << rp.ecmc_params.param_theta_sample << "\n";
-    file << "theta_refresh_site = " << rp.ecmc_params.param_theta_refresh_site << "\n";
-    file << "theta_refresh_R = " << rp.ecmc_params.param_theta_refresh_R << "\n";
+    file << "theta_refresh= " << rp.ecmc_params.param_theta_refresh << "\n";
     file << "epsilon_set = " << rp.ecmc_params.epsilon_set << "\n";
     file << "poisson = " << rp.ecmc_params.poisson << "\n\n";
 
