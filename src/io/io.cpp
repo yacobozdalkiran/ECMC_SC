@@ -48,6 +48,34 @@ void io::save_plaquette(const std::vector<double>& data, const std::string& file
     std::cout << "Plaquette written in " << filepath << "\n";
 }
 
+void io::save_polyakov(const std::vector<double>& data, const std::string& filename,
+                        const std::string& dirpath, int precision) {
+    // Create a data folder if doesn't exists
+    fs::path base_dir(dirpath);
+    fs::path dir = base_dir / filename;
+
+    try {
+        if (!fs::exists(dir)) {
+            fs::create_directories(dir);
+        }
+    } catch (const fs::filesystem_error& e) {
+        std::cerr << "Couldn't create folder data : " << e.what() << std::endl;
+        return;
+    }
+    fs::path filepath = dir / (filename + "_polyakov.txt");
+
+    std::ofstream file(filepath, std::ios::out | std::ios::app);
+    if (!file.is_open()) {
+        std::cout << "Could not open file " << filepath << "\n";
+        return;
+    }
+    file << std::fixed << std::setprecision(precision);
+    for (const double& x : data) {
+        file << x << "\n";
+    }
+    file.close();
+    std::cout << "Polyakov norm written in " << filepath << "\n";
+}
 void io::save_event_nb(const std::vector<size_t>& event_nb, const std::string& filename,
                        const std::string& dirpath) {
     // Create a data folder if doesn't exists
@@ -348,6 +376,7 @@ void io::load_params(const std::string& filename, RunParamsECB& rp) {
     if (config.count("poisson")) rp.ecmc_params.poisson = (config["poisson"] == "true");
     if (config.count("epsilon_set")) rp.ecmc_params.epsilon_set = std::stod(config["epsilon_set"]);
 
+    if (config.count("polyakov")) rp.polyakov = (config["polyakov"] == "true");
     if (config.count("N_plaquette")) rp.N_plaquette = std::stoi(config["N_plaquette"]);
     // Run and topo params
     if (config.count("N_therm")) rp.N_therm = std::stoi(config["N_therm"]);
@@ -392,6 +421,7 @@ void io::load_params(const std::string& filename, RunParamsHbCB& rp) {
 
     // Run and topo params
     if (config.count("N_therm")) rp.N_therm = std::stoi(config["N_therm"]);
+    if (config.count("polyakov")) rp.polyakov = (config["polyakov"] == "true");
 
     // Run name
     if (config.count("run_name")) rp.run_name = config["run_name"];

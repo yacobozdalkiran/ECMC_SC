@@ -46,6 +46,8 @@ void generate_metro(const RunParamsHbCB& rp, bool existing) {
     // Measure vectors
     std::vector<double> plaquette;
     plaquette.reserve(rp.save_each / rp.N_plaquette + 2);
+    std::vector<double> polyakov;
+    polyakov.reserve(rp.save_each / rp.N_plaquette + 2);
 
     io::save_params(rp, rp.run_name, rp.run_dir);
 
@@ -101,6 +103,10 @@ void generate_metro(const RunParamsHbCB& rp, bool existing) {
             std::cout << "\n====== Configuration " << i << " ======\n";
             std::cout << "Sample " << i / rp.N_plaquette << ", <P> = " << p << "\n";
             plaquette.emplace_back(p);
+            if (rp.polyakov) {
+                double loop = mean_polyakov_loop(field, geo);
+                polyakov.emplace_back(loop);
+            }
         }
 
         // Save conf/seed/chain state/obs
@@ -109,6 +115,7 @@ void generate_metro(const RunParamsHbCB& rp, bool existing) {
             // Write the output
             int precision = 10;
             io::save_plaquette(plaquette, rp.run_name, rp.run_dir, precision);
+            io::save_polyakov(polyakov, rp.run_name, rp.run_dir, precision);
             io::add_shift(i, rp.run_name, rp.run_dir);
             // Save conf
             save_ildg(field, geo, rp.run_name, rp.run_dir);
@@ -119,6 +126,8 @@ void generate_metro(const RunParamsHbCB& rp, bool existing) {
             // Clear the measures
             plaquette.clear();
             plaquette.reserve(rp.save_each / rp.N_plaquette + 2);
+            polyakov.clear();
+            polyakov.reserve(rp.save_each / rp.N_plaquette + 2);
         }
     }
 
@@ -129,6 +138,7 @@ void generate_metro(const RunParamsHbCB& rp, bool existing) {
     // Write the output
     int precision = 10;
     io::save_plaquette(plaquette, rp.run_name, rp.run_dir, precision);
+    io::save_polyakov(polyakov, rp.run_name, rp.run_dir, precision);
     io::add_shift(rp.N_samples, rp.run_name, rp.run_dir);
     io::add_finished(rp.run_name, rp.run_dir);
     // Save conf

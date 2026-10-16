@@ -30,6 +30,7 @@ struct RunParamsECB {
     ECMCParams ecmc_params{};  // Params of the ECMC for each even/odd update
     int N_therm = 100;     //Number of thermalisation shifts
     int N_samples=10;
+    bool polyakov = true;
     bool topo = true;
     int N_plaquette = 2; //Measure plaquette every N_shift_plaquette_shift
     std::string run_name="c";
@@ -44,6 +45,7 @@ struct RunParamsHbCB {
     HbParams hp{};  // Hb params for each even/odd update
     int N_therm = 100;     //Number of thermalisation shifts
     int N_samples=10;
+    bool polyakov = true;
     bool topo = true;
     int N_plaquette = 2; //Measure plaquette every N_shift_plaquette_shift
     std::string run_name="c";

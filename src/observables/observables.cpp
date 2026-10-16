@@ -21,3 +21,21 @@ double mean_plaquette(const GaugeField& field, const GeometryCB& geo) {
     }
     return sum/((double)geo.V*6);
 }
+
+// Computation of the spatially averaged Polyakov loop (temporal direction mu = 3)
+// P = 1/L^3 sum_x 1/3 Tr prod_{t=0}^{L-1} U_3(x, t)
+double mean_polyakov_loop(const GaugeField& field, const GeometryCB& geo) {
+    Complex sum(0.0, 0.0);
+    SU3 P;
+    size_t V3 = static_cast<size_t>(geo.L) * geo.L * geo.L;
+    for (size_t site0 = 0; site0 < V3; site0++) {  // sites of the t = 0 slice
+        P = SU3::Identity();
+        size_t site = site0;
+        for (int t = 0; t < geo.L; t++) {
+            P *= field.view_link_const(site, 3);
+            site = geo.get_neigh(site, 3, up);
+        }
+        sum += P.trace() / 3.0;
+    }
+    return std::abs(sum / static_cast<double>(V3));
+}

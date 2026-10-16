@@ -34,7 +34,8 @@ void generate_ecmc_cb(const RunParamsECB& rp, bool existing) {
         read_ildg(field, geo, rp.run_name, rp.run_dir);
         io::load_state(state, rp.run_name, rp.run_dir);
 
-        fs::path state_path = fs::path(rp.run_dir) / rp.run_name / (rp.run_name + "_seed")/(rp.run_name+"_seed.txt");
+        fs::path state_path = fs::path(rp.run_dir) / rp.run_name / (rp.run_name + "_seed") /
+                              (rp.run_name + "_seed.txt");
         std::ifstream ifs(state_path);
         if (ifs.is_open()) {
             ifs >> rng;
@@ -49,6 +50,8 @@ void generate_ecmc_cb(const RunParamsECB& rp, bool existing) {
 
     // Measure vectors
     std::vector<double> plaquette;
+    std::vector<double> polyakov;
+    polyakov.reserve(rp.save_each / rp.N_plaquette + 2);
     plaquette.reserve(rp.save_each / rp.N_plaquette + 2);
 
     std::vector<size_t> event_nb;
@@ -100,6 +103,10 @@ void generate_ecmc_cb(const RunParamsECB& rp, bool existing) {
             std::cout << "\n====== Configuration " << i << " ======\n";
             std::cout << "Sample " << i / rp.N_plaquette << ", <P> = " << p << "\n";
             plaquette.emplace_back(p);
+            if (rp.polyakov) {
+                double loop = mean_polyakov_loop(field, geo);
+                polyakov.emplace_back(loop);
+            }
             unsigned long local_lifts = state.lift_counter;
             unsigned long local_events = state.event_counter;
             unsigned long local_rev = state.rev_counter;
@@ -113,12 +120,11 @@ void generate_ecmc_cb(const RunParamsECB& rp, bool existing) {
             std::cout << ">>> Average \u03bb = " << local_lambda << ", Events : " << local_events
                       << " (Reversibility : " << (double)local_rev / (double)local_lifts * 100
                       << "%)\n";
-        // Event counter reinitialized
-        state.event_counter = 0;
-        state.lift_counter = 0;
-        state.rev_counter = 0;
+            // Event counter reinitialized
+            state.event_counter = 0;
+            state.lift_counter = 0;
+            state.rev_counter = 0;
         }
-
 
         // Save conf/seed/chain state/obs
         if (i > 0 and i % rp.save_each == 0) {
@@ -126,6 +132,7 @@ void generate_ecmc_cb(const RunParamsECB& rp, bool existing) {
             // Write the output
             int precision = 10;
             io::save_plaquette(plaquette, rp.run_name, rp.run_dir, precision);
+            io::save_polyakov(polyakov, rp.run_name, rp.run_dir, precision);
             io::add_shift(i, rp.run_name, rp.run_dir);
             io::save_event_nb(event_nb, lift_nb, rev_nb, lambda, rp.run_name, rp.run_dir);
             // Save conf
@@ -138,6 +145,8 @@ void generate_ecmc_cb(const RunParamsECB& rp, bool existing) {
             // Clear the measures
             plaquette.clear();
             plaquette.reserve(rp.save_each / rp.N_plaquette + 2);
+            polyakov.clear();
+            polyakov.reserve(rp.save_each / rp.N_plaquette + 2);
             event_nb.clear();
             event_nb.reserve(rp.save_each / rp.N_plaquette + 2);
             lift_nb.clear();
@@ -156,6 +165,7 @@ void generate_ecmc_cb(const RunParamsECB& rp, bool existing) {
     // Write the output
     int precision = 10;
     io::save_plaquette(plaquette, rp.run_name, rp.run_dir, precision);
+    io::save_polyakov(polyakov, rp.run_name, rp.run_dir, precision);
     io::add_shift(rp.N_samples, rp.run_name, rp.run_dir);
     io::add_finished(rp.run_name, rp.run_dir);
     io::save_event_nb(event_nb, lift_nb, rev_nb, lambda, rp.run_name, rp.run_dir);
